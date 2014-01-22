@@ -1,4 +1,5 @@
 ###     2011-09-26   normal-normal proliferation controls example
+###  Presented  2014-01-22
 
 #png("dailyControls-raw-data.png", width=960)
 ###  Regarding graphics:   I find the best graphics into a document is to plot into the native plot window. adjust the way you want, then use a screen grabber.  In windows, Faststone capture is great.  In Mac use cmd-control-shift-4 to put selected area into pastebuffer.
