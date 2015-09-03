@@ -58,27 +58,41 @@ mseFunction = function(w)
     (estimatedDailyEffects*w + priorMean*(1-w) - trueDailyEffects)^2
   ) 
 mseVector = sapply(shrinkerVector, mseFunction)
+
 plot(shrinkerVector, mseVector, type="l", xlab="shrinker", ylab="mean(squared error)", ylim=c(0, 0.35))
 
 points(x=0, y=mseVector[1], pch=".", cex=10)
-text(0, mseVector[1], expression(hat(beta) == zero), pos=4)
-text(0, mseVector[1] - 0.025, "(prior)", pos=4)
+text(0, mseVector[1] + 0.03, expression(hat(beta) == zero), pos=4)
+text(0, mseVector[1] , "(prior)", pos=4)
 
 points(x=1, y=mseVector[length(mseVector)], pch=".", cex=10)
-text(1  - 0.1, y=mseVector[length(mseVector)], 
-     expression(hat(beta) == X), pos=1)
+text(1  - 0.15, y=mseVector[length(mseVector)]+0.05, 
+     expression(hat(beta) == X(MLE)), pos=1)
 
-points(x=shrinkerB, y=mseFunction(shrinkerB), pch=".", cex=10)
-text(shrinkerB, mseFunction(shrinkerB), expression(hat(beta) == delta[B] ), pos=3)
-text(shrinkerB, mseFunction(shrinkerB)-0.025,  "Bayes rule", pos=3)
-text(shrinkerB, mseFunction(shrinkerB)-0.05, parse(text="(a[B])"), pos=3)  ### roughly equivalent to expression()
-abline(v=shrinkerB)
+points(x=shrinkerB, y=mseFunction(shrinkerB), pch=".", cex=10,
+       col="red")
+text(col="red", adj=c(0,0),
+     shrinkerB, mseFunction(shrinkerB)+0.05, 
+     expression(hat(beta)== a[B](X)))
+text(col="red", adj=c(0,0),
+     shrinkerB+0.05, mseFunction(shrinkerB)-0.02,  
+     "Bayes rule")
+# text(col="red", adj=c(1,1),
+#      shrinkerB, mseFunction(shrinkerB)-0.09, "(a[B])"))  ### roughly equivalent to expression()
+#abline(col="red", v=shrinkerB)
 
 whichAppearsBest = which(mseVector == min(mseVector))[1]
 points(x=shrinkerVector[whichAppearsBest], 
-       y=mseVector[whichAppearsBest], pch=".", cex=10)
-text(shrinkerVector[whichAppearsBest], mseVector[whichAppearsBest],
-     expression(hat(beta) == delta[hat(B)] ), pos=4)
+       y=mseVector[whichAppearsBest], pch=".", cex=10,
+       col="darkgreen")
+text(shrinkerVector[whichAppearsBest], 
+     mseVector[whichAppearsBest],
+     expression(hat(beta) == delta[hat(B)] ), adj=c(1,1),
+     col="darkgreen")
+text(col="darkgreen", adj=c(1/2,1),
+     shrinkerVector[whichAppearsBest],
+     mseVector[whichAppearsBest] - 0.05,
+     "estimated Bayes rule")
 
 
 #### For the "plotmath" stuff to work, 3rd arg  has to be parsable as an R expression.
