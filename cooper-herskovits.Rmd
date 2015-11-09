@@ -1,0 +1,48 @@
+First, just double-check the beta-binomial with Beta(1,1):
+```{r}
+table(rbinom(1e5, 9, rbeta(1e5,1,1)))
+```
+We obtain a uniform on 0,...,9, as expected.
+
+```{r loadLibrary, results='hide', echo=FALSE}
+suppressMessages(
+  require("rBeta2009"))  ## Introduce rdirichlet.
+myRdir = function(r, shape){
+  if(length(shape)==2) 
+    return(c(p<-rbeta(r, shape[1], shape[2]), 1-p))
+  return(rdirichlet(r, shape))
+} # Necessary because of an annoyance in design of rdirichlet
+```
+Now we'll try it with a uniform dirichlet and multinomial:
+```{r}
+K = 4  ## ri
+N = 5  ## Nij
+alphas = rep(1,K)
+D <- table(sapply(1:1e5, function(ignoreMe) 
+  paste(collapse=",", rmultinom(1, N, myRdir(1, alphas))
+)))
+D
+```
+So this looks uniform across the sample space.
+```{r}
+normalize = function(V) V/sum(V)
+summary(as.vector(normalize(D)))
+```
+Yes indeed, uniform.
+### Relationship to impurity indices for CART
+#### inverse binomial coefficient versus gini index:
+```{r}
+library(plyr)
+outcomeArray=apply(FUN=as.numeric, MARGIN=1:2,
+                 ldply(strsplit(names(D), split=","))
+                 )
+impurity = data.frame(outcomes = names(D),
+           binom=factorial(N) / 
+             apply(outcomeArray, 1, 
+                   function(nn) prod(factorial(nn)) ), 
+     gini=apply(outcomeArray, 1, 
+           function(nn) sum(nn/sum(nn) * (1-nn/sum(nn)))))
+with(impurity, plot(binom, gini,
+     xlab="binomial coef",
+     ylab="gini index") )
+```
