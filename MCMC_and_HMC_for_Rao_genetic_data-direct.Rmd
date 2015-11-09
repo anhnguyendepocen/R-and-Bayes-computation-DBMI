@@ -93,7 +93,7 @@ hist(chainData[ , "x2"])
 plot(density(chainData[ , "phi"]))
 ```
 
-Using *rstan* to do MCMC on this problem is problematic, because STAN does not handle unknowns with discrete support. Therefore STAN cannot handle *x2* directly. Here is an attempt (among many), but it will not compile.
+Using *rstan* to do MCMC on this problem is problematic, because STAN does not handle unknowns with discrete support. Therefore STAN cannot handle *x2* directly. Here is an attempt (among many), but it will not compile. However, see below for a solution.
 ```{r}
 stanCodeForRaoExample = '
 data {
@@ -134,6 +134,11 @@ A similar problem arises with mixture models with a finite number of components.
 yRao = y.rao #### stan cannot handle dots in names.
 K = 4
 library(rstan)
+stanModelMatrix = rstan::lookup("~")
+head(stanModelMatrix)
+stanModelMatrix[
+  stanModelMatrix$StanFunction=="binomial",] 
+lookup("rbinom")
 stanCodeForRaoExample = '
 data {
   int<lower=1> K; // number of categories, 4
@@ -155,6 +160,10 @@ transformed parameters {
 }
 model {
   yRao ~ binomial(N, theta);
+}
+generated quantities {
+  int X2;
+  X2 <- binomial_rng(yRao[1], theta[1]);
 }
 '
 stan.fit.rao <- stan(
@@ -178,24 +187,23 @@ ggsObj = ggs(stan.fit.rao, stan_include_auxiliar=TRUE)
 ggs_Rhat(ggsObj)
 ggs_traceplot(ggsObj)
 ggs_density(ggsObj, family="phi")
-require(gridGraphics)
-grid.ls()  ### grobs only
-grid.ls(grobs=F, viewports=T)
-grid.ls(grobs=F, viewports=T, fullNames=T)
-nestedListing(current.viewport())
-pathListing("ROOT")
-grobPathListing(current.viewport())
-phiDensity = density(chainData[ , "phi"])
-#plot(phiDensity)
-grid.lines(phiDensity$x, phiDensity$y, 
-           default.units = "native")
+# require(gridGraphics)
+# grid.ls()  ### grobs only
+# grid.ls(grobs=F, viewports=T)
+# grid.ls(grobs=F, viewports=T, fullNames=T)
+# nestedListing(current.viewport())
+# pathListing("ROOT")
+# grobPathListing(current.viewport())
+# phiDensity = density(chainData[ , "phi"])
+# #plot(phiDensity)
+# grid.lines(phiDensity$x, phiDensity$y, 
+#            default.units = "native")
 # ggs_density(ggsObj, family="phi") +
 #   geom_line(data = as.data.frame(
 #     density(chainData[,"phi"])[1:2]),
 #     mapping = aes(x=x, y=y, colour="black",
 #                   fill=NA) )
 
-library(grDevices)
 ```
 
 
