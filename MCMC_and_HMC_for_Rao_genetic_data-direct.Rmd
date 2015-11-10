@@ -179,6 +179,7 @@ summary(chainData[ , "phi"])
 stan.fit.rao@sim$chains  ## 4
 dim(laply(stan.fit.rao@sim$samples, cbind))
 
+
 library(coda)
 coda::autocorr.plot(As.mcmc.list(stan.fit.rao))
 
@@ -187,6 +188,10 @@ ggsObj = ggs(stan.fit.rao, stan_include_auxiliar=TRUE)
 ggs_Rhat(ggsObj)
 ggs_traceplot(ggsObj)
 ggs_density(ggsObj, family="phi")
+ggs_density(ggsObj, family="X2")
+###  Looks good.
+
+###   We would like to overlay with the previous MCMC density. Adding stuff to a ggplot2 graph using ordinary graphics seems impossible.  Using grid commangs might be possible, but for now we give up.
 # require(gridGraphics)
 # grid.ls()  ### grobs only
 # grid.ls(grobs=F, viewports=T)
